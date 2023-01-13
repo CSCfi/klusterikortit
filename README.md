@@ -12,6 +12,8 @@ Tässä tietovarastossa on saatavilla ohjelmakoodit AuroraAI-projektin Tilanneku
 
 ## Lähdekoodit
 
+Pilottiprojektit on toteutettu Python-ohjelmointikielellä. Esikäsittelyssä ja klusterien muodostamisessa käytetään Jupyter Notebookeja, jotka sijaitsevat alihakemistossa [notebooks](notebooks). Klusterikorttien visualisoinnit on toteutettu Dash-kirjastolla, ja nämä skriptit sijaitsevat alihakemistossa [dashboards](dashboards).
+
 ## Analyysin vaiheet
 
 ### Esikäsittely
