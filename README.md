@@ -6,7 +6,7 @@ Tässä tietovarastossa on saatavilla ohjelmakoodit AuroraAI-projektin Tilanneku
 
 ## Aineistot
 
-* Marketing Campaign: Vapaasti saatavilla oleva esimerkkiaineisto Klusterikorttien testaamiseeen. Aineisto on ladattavissa osoitteesta https://www.kaggle.com/datasets/rodsaldanha/arketing-campaign (`marketing_campaign.csv`, Version 8).
+* Marketing Campaign: Vapaasti saatavilla oleva esimerkkiaineisto Klusterikorttien testaamiseeen. Aineisto on ladattavissa osoitteesta https://www.kaggle.com/datasets/rodsaldanha/arketing-campaign (`marketing_campaign.csv`, Version 8). Aineistoon liittyvä muuttujamatriisi (`marketing-campaign-muuttujat.xlsx`) sijaitsee alihakemistossa [data](data).
 * Mun ripari:
 * Kouluterveyskysely:
 
