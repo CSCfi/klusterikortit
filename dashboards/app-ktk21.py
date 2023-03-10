@@ -315,10 +315,15 @@ def update_largest_vars(cl):
     df_max = pd.concat([dfa, dfb]).sort_values('order')
     #colorvec = np.where(largest < 0, neg_color, pos_color)
     #color2vec = np.where(largest < 0, neg2_color, pos2_color)
+    if 'short_description' in variables[next(iter(variables))]:
+        varlabels = df_max.index.to_series().apply(
+            lambda x: variables[x]['short_description'])
+    else:
+        varlabels = df_max.index
     description = df_max.index.to_series().apply(
         lambda x: variables[x]['description'])
     description = description.apply(brify_string)
-    fig = go.Figure(data=go.Bar(y=df_max.index, #[s[:21] for s in largest.index],
+    fig = go.Figure(data=go.Bar(y=varlabels, #df_max.index, #[s[:21] for s in largest.index],
                                 x=np.tanh(df_max.data), orientation='h',
                                 marker=dict(
                                     color=df_max.color,
@@ -355,18 +360,17 @@ def update_smallest_vars(cl):
     dfa["color"] = np.where(dfa.data < 0, neg_color, pos_color)
     dfb["color"] = np.where(dfb.data < 0, neg2_color, pos2_color)
     df_min = pd.concat([dfa, dfb]).sort_values('order')
-    #smallest = dfcc.loc[cl].sort_values(ascending=False)[-10:]
-    #colorvec = np.where(smallest < 0, neg_color, pos_color)
-    #color2vec = np.where(smallest < 0, neg2_color, pos2_color)
+    if 'short_description' in variables[next(iter(variables))]:
+        varlabels = df_min.index.to_series().apply(
+            lambda x: variables[x]['short_description'])
+    else:
+        varlabels = df_min.index
     description = df_min.index.to_series().apply(
         lambda x: variables[x]['description'])
     description = description.apply(brify_string)
-    fig = go.Figure(data=go.Bar(y=df_min.index, #[s[:21] for s in smallest.index],
+    fig = go.Figure(data=go.Bar(y=varlabels, #df_min.index, #[s[:21] for s in smallest.index],
                                 x=np.tanh(df_min.data), orientation='h',
-                                marker=dict(
-                                    color=df_min.color,
-                                    #line=dict(color=colorvec, width=2)
-                                    ),
+                                marker=dict(color=df_min.color),
                                 customdata=description,
                                 hovertemplate='%{x:.2f}: %{y}:<br>%{customdata}<extra></extra>'))
     fig.update_xaxes(range=[-1.01, 0.01]) #, tickvals=[-1, -0.75, -0.5, -0.25, 0])
