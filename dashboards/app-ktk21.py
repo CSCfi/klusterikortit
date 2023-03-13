@@ -219,10 +219,13 @@ def update_bar_chart(cl, ds, showvars):
     if len(showvars)>0:
         dfvars = dfvarslist[int(ds)]
         dfvarscl = dfvars[dfvars['klusteri']==cl]
+        c1 = [variables[x]['short_description'] for x in dfvarscl['variable']]
+        c2 = [" (NEG)" if variables[x]['multiplier']<0 else "" for x in dfvarscl['variable']]
+        customdata = [i + j for i, j in zip(c1, c2)]
         fig.add_trace(go.Scatter(x=dfvarscl['x_noise'],
                                  y=np.tanh(dfvarscl['y']),
                                  marker_color=var_color,
-                                 customdata=dfvarscl['variable'],
+                                 customdata=customdata,
                                  hovertemplate='%{y:.2f}: %{customdata}<extra></extra>',
                                  mode = 'markers'))
 
