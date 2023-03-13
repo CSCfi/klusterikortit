@@ -1,0 +1,17 @@
+# This file should be copied as "config.yml" and then filled with suitable values.
+
+dataset: dataset1
+
+dataset1:
+  datadate: '2023-02-14'
+  datasets:
+    - {name: "Example dataset1", dir: "dataset-1", ps: 4}
+  maindataset: 0
+
+dataset2:
+  datadate: '2022-10-18'
+  datasets:
+    - {name: "Example multi-part dataset, part1", dir: "dataset-2-part1", ps: 2}
+    - {name: "Example multi-part dataset, part2", dir: "dataset-2-part2", ps: 4}
+    - {name: "Example multi-part dataset, part3", dir: "dataset-2-part3", ps: 4}
+  maindataset: 1
