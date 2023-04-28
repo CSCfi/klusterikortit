@@ -33,3 +33,4 @@ Pilottiprojektit on toteutettu Python-ohjelmointikielellä. Esikäsittelyssä ja
 * Marketing Campaign: [dashboards/app-mc.py](dashboards/app-mc.py)
 * Mun ripari: [dashboards/app-munripari.py](dashboards/app-munripari.py)
 * Kouluterveyskysely: [dashboards/app-ktk21.py](dashboards/app-ktk21.py)
+* Vaalit 2019: [dashboards/app-vaalit19.py](dashboards/app-vaalit19.py)
