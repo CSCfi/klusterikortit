@@ -14,3 +14,19 @@ mc:
   n_clusters_kmeans: 6
   pointsize: 5
   outdir: "mc"
+
+# YLE 2019 election compass:
+
+vaalit19:
+  datadir: "/PATH/TO/DATA"
+  datafile: "Avoin_data_eduskuntavaalit_2019_valintatiedot.csv"
+  metafile: "vaalit2019-muuttujat.xlsx"
+  varsfile: "vaalit2019-data-2023-XX-YY.csv"
+  bgrvfile: "vaalit2019-bg-2023-XX-YY.csv"
+  filter_region: null
+  transpose: False
+  index_col: 0
+  n_clusters_kmeans: 8
+  pointsize: 5
+  outdir: "vaalit2019"
+  outprefix: "vaalit2019"
