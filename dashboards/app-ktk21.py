@@ -12,6 +12,7 @@ from dash_bootstrap_templates import load_figure_template
 load_figure_template("materia")
 
 from yamlconfig import read_config
+from plotutils import confidence_ellipse
 
 # ----------------------------------------------------------------------
 
@@ -131,9 +132,9 @@ def display_page(pathname):
                                               'value': int(r['klusteri'])} for _, r in df.iterrows()],
                                             value=1, id='selected_cluster',
                                             labelStyle={'display': 'block'}, inputStyle={"margin-right": "5px"}), width=3),
-                     dbc.Col(html.Div(id='longdescription',
-                                      style={'font-size': 'x-large', "padding": "1rem 1rem",
-                                             "background-color": bgr_color}),
+                     dbc.Col(dcc.Markdown(id='longdescription', dangerously_allow_html=True,
+                                          style={'font-size': 'x-large', "padding": "1rem 1rem",
+                                                 "background-color": bgr_color}),
                              width={"size": 9, "offset": 0},),
                      ], align="center", style={"padding": "1rem 1rem", }),
             dbc.Row([dbc.Col([html.Div(id='fractiontitle', style={'font-size': 'large', }),
@@ -143,18 +144,25 @@ def display_page(pathname):
                                   'font-size': 'large', }),
                               html.Div(id='lifecontentment',
                                        style={'font-size': 'xx-large', "padding": "0.5rem 0.5rem"}),
+                              html.Div("Luotettava aikuinen koulussa:", style={
+                                  'font-size': 'large', }),
+                              html.Div(id='ind_trusted_adult_school',
+                                       style={'font-size': 'xx-large', "padding": "0.5rem 0.5rem"}),
                               html.Div("Sukupuoli (pojat/tytöt):", style={
                                   'font-size': 'large', }),
                               html.Div(id='sex',
                                        style={'font-size': 'x-large', "padding": "0.5rem 0.5rem"}),
                               dcc.Checklist(options=[{'label': 'Näytä muuttujat', 'value': 'showvars'}],
-                                            value=['showvars'], id='show_variables',
+                                            value=[], #value=['showvars'], 
+                                            id='show_variables',
                                             inputStyle={"margin-right": "5px"},
                                             style={"padding": "0.5rem 0.5rem"}),
                               dbc.Tooltip("Osuus kaikista nuorista, jotka kuuluvat tähän klusteriin",
                                           target="fraction", placement='bottom-start'),
                               dbc.Tooltip("Klusterin keskimääräinen tyytyväisyysindeksi (maksimiarvo: 1, minimi: 0)",
                                           target="lifecontentment", placement='bottom-start'),
+                              dbc.Tooltip("Mahdollisuus keskustella koulussa aikuisen kanssa mieltä painavista asioista",
+                                          target="ind_trusted_adult_school", placement='bottom-start'),
                               dbc.Tooltip("Sukupuolijakauma tässä klusterissa",
                                           target="sex", placement='bottom-start'),
                               dbc.Tooltip("Näytetäänkö yksittäiset muuttujat kullekin hyvinvoinnin ulottuvuudelle",
@@ -171,11 +179,13 @@ def display_page(pathname):
     elif pathname == "/page-2":
         return dbc.Container([
             dbc.Row(dbc.Col(dcc.Graph(id="large_pca"))),
-            dbc.Row([dbc.Col(dcc.RadioItems([{'label': 'PCA 2: '+descriptions['pca_components'][1], 'value': 'PCA 2'},
-                                             {'label': 'PCA 3: '+descriptions['pca_components'][2], 'value': 'PCA 3'},
-                                             {'label': 'PCA 4: '+descriptions['pca_components'][3], 'value': 'PCA 4'}],
-                                            value='PCA 2', id='selected_component',
-                                            labelStyle={'display': 'block'}, inputStyle={"margin-right": "5px"}), width=6),
+            dbc.Row([dbc.Col([html.Div("Pystyakselin PCA-komponentti:", style={'font-size': 'large', }),
+                              dcc.RadioItems([{'label': 'PCA 2: '+descriptions['pca_components'][1], 'value': 'PCA 2'},
+                                              {'label': 'PCA 3: '+descriptions['pca_components'][2], 'value': 'PCA 3'},
+                                              {'label': 'PCA 4: '+descriptions['pca_components'][3], 'value': 'PCA 4'}],
+                                             value='PCA 2', id='selected_component',
+                                             labelStyle={'display': 'block'}, inputStyle={"margin-right": "5px"})], 
+                             width=6),
                      dbc.Col([html.Div('Klusteri {}: "{}"'.format(int(r['klusteri']),
                                                                   r['description']), style={'font-size': 'small', }) for _, r in df.iterrows()])
                      ], style={"padding": "1rem 1rem", },
@@ -265,8 +275,8 @@ def update_fraction(cl, ds):
     Input("selected_cluster", "value"))
 def update_longdescription(cl):
     df2 = df[df.klusteri == cl]
-    return 'Klusteri {}: '.format(cl)+df2['longdescription']
-
+    #return 'Klusteri {}: '.format(cl)+df2['longdescription']
+    return df2['longdescription']
 
 @app.callback(
     Output("lifecontentment", "children"),
@@ -277,6 +287,14 @@ def update_contentment(cl, ds):
     #lc = 1-(dfv.lifecontentment[cl-1]-1)/4
     lc = dfv.lifecontentment[cl-1]/4
     return f'{lc:.2f}'
+
+@app.callback(
+    Output("ind_trusted_adult_school", "children"),
+    Input("selected_cluster", "value"),
+    Input("selected_dataset", "value"))
+def update_trusted_adult(cl, ds):
+    dfv = dfvlist[int(ds)]
+    return f'{round(dfv.ind_trusted_adult_school[cl-1]*100)} %'
 
 @app.callback(
     Output("sex", "children"),
@@ -450,12 +468,27 @@ def update_largepca_scatter(comp, ds):
                                  'pca3': False, 'pca4': False, 
                                  'PCA 1': (':.2f', dfpca.pca1),
                                  str(comp): (':.2f', dfpca[pcadict[comp]])})
+    for _, r in df.iterrows():
+        cl = int(r['klusteri'])
+        dfpcacl = dfpca[dfpca['klusteri']==cl]
+        path = confidence_ellipse(dfpcacl["pca1"], dfpcacl[pcadict[comp]])
+        fig.add_shape(type='path',
+                      path=path,
+                      line={'width': 5, 'color': 'black'}
+        )
+        fig.add_shape(type='path',
+                      path=path,
+                      line={'width': 3, #'dash': 'dot',
+                            'color': px.colors.qualitative.G10[cl-1]}
+        )
+
+
     fig.update_traces(marker={'size': datasets[int(ds)]['ps']})
     fig.update_layout(font_family="'Source Sans Pro', sans-serif")
     fig.update_layout(title={'y':0.95, 'x':0, 'font_size':24})
     fig.update_layout(showlegend=True, legend= {'itemsizing': 'constant'})
     return fig
-
+    
 # ----------------------------------------------------------------------
 
 
